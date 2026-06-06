@@ -36,8 +36,8 @@ jobs:
         username: daffaamru
         password: dckr_pat_uHRTr_-pROT63FVTJio8JQ14f50
 
-    # Mengubah target push image ke repositori daffaamru
+    # Menggunakan bendera -f untuk menunjuk langsung ke file Dockerfile kamu
     - name: Build and Push Docker Image
       run: |
-        docker build -t daffaamru/workflow-ci-sml:latest ./MLProject
+        docker build -f ./MLProject/Dockerfile -t daffaamru/workflow-ci-sml:latest ./MLProject
         docker push daffaamru/workflow-ci-sml:latest
