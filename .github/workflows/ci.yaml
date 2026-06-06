@@ -11,36 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Mengambil kode dari repositori GitHub kamu
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. Setup environment Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    # 3. Install library yang dibutuhkan untuk testing script
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install mlflow pandas numpy scikit-learn
 
-    # === PERBAIKAN: Menghapus baris hardcoded set_tracking_uri agar menggunakan lokal direktori ===
+    # Perintah dijalankan bersih tanpa perlu memotong script dengan sed
     - name: Run MLflow Experiment
       run: |
-        sed -i '/mlflow.set_tracking_uri/d' MLProject/modelling.py
         mlflow run MLProject/ --env-manager local
 
-    # 4. Login otomatis ke akun Docker Hub milikmu
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 5. Mengarahkan build Docker ke dalam folder MLProject
     - name: Build and Push Docker Image
       run: |
         docker build -t amruaja/workflow-ci-sml:latest ./MLProject
