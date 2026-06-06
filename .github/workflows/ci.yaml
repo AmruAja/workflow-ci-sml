@@ -15,7 +15,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2. Setup environment Python (Sudah diperbaiki dari python-python)
+    # 2. Setup environment Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -27,10 +27,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install mlflow pandas numpy scikit-learn
 
-    # === TAMBAHAN REVISI: Menjalankan Eksperimen MLflow sesuai instruksi reviewer ===
+    # === REVISI 1: Menghapus --no-conda dan mengarahkan ke folder MLProject yang benar ===
     - name: Run MLflow Experiment
       run: |
-        mlflow run . --no-conda
+        mlflow run MLProject/
 
     # 4. Login otomatis ke akun Docker Hub milikmu
     - name: Log in to Docker Hub
@@ -39,8 +39,9 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 5. Membuat (Build) Image Docker dan Mengunggah (Push) ke Docker Hub amruaja
+    # === REVISI 2: Mengarahkan build Docker ke dalam folder MLProject ===
+    # Karena Dockerfile/konfigurasi kamu berada di dalam folder MLProject
     - name: Build and Push Docker Image
       run: |
-        docker build -t amruaja/workflow-ci-sml:latest .
+        docker build -t amruaja/workflow-ci-sml:latest ./MLProject
         docker push amruaja/workflow-ci-sml:latest
