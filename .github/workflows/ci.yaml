@@ -27,10 +27,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install mlflow pandas numpy scikit-learn
 
-    # === REVISI 1: Menghapus --no-conda dan mengarahkan ke folder MLProject yang benar ===
+    # === PERBAIKAN UTAMA: Menambahkan --system-env agar tidak mencari Conda ===
     - name: Run MLflow Experiment
       run: |
-        mlflow run MLProject/
+        mlflow run MLProject/ --system-env
 
     # 4. Login otomatis ke akun Docker Hub milikmu
     - name: Log in to Docker Hub
@@ -39,8 +39,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # === REVISI 2: Mengarahkan build Docker ke dalam folder MLProject ===
-    # Karena Dockerfile/konfigurasi kamu berada di dalam folder MLProject
+    # 5. Mengarahkan build Docker ke dalam folder MLProject
     - name: Build and Push Docker Image
       run: |
         docker build -t amruaja/workflow-ci-sml:latest ./MLProject
