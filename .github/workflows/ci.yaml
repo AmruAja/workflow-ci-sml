@@ -29,13 +29,15 @@ jobs:
       run: |
         mlflow run MLProject/ --env-manager local
 
+    # Login menggunakan akun baru daffaamru dan token ke-4 yang fresh
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: daffaamru
+        password: dckr_pat_uHRTr_-pROT63FVTJio8JQ14f50
 
+    # Mengubah target push image ke repositori daffaamru
     - name: Build and Push Docker Image
       run: |
-        docker build -t amruaja/workflow-ci-sml:latest ./MLProject
-        docker push amruaja/workflow-ci-sml:latest
+        docker build -t daffaamru/workflow-ci-sml:latest ./MLProject
+        docker push daffaamru/workflow-ci-sml:latest
