@@ -27,10 +27,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install mlflow pandas numpy scikit-learn
 
-    # === PERBAIKAN UTAMA: Menambahkan --system-env agar tidak mencari Conda ===
+    # === PERBAIKAN: Menggunakan --env-manager local agar MLflow menggunakan environment aktif ===
     - name: Run MLflow Experiment
       run: |
-        mlflow run MLProject/ --system-env
+        mlflow run MLProject/ --env-manager local
 
     # 4. Login otomatis ke akun Docker Hub milikmu
     - name: Log in to Docker Hub
