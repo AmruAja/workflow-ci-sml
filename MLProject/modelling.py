@@ -8,16 +8,19 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error, r2_score
 
 def main():
-    mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    mlflow.set_experiment("Car Price Prediction")
+    # Ambil tracking URI dari environment variabel. Jika tidak ada, gunakan localhost port 5000
+    tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
+    mlflow.set_tracking_uri(tracking_uri)
     
+    mlflow.set_experiment("Car Price Prediction")
     mlflow.sklearn.autolog()
     
     possible_paths = [
         os.path.join("Membangun_model", "namadataset_preprocessing"),
         "namadataset_preprocessing",
         "../namadataset_preprocessing",
-        os.path.join("preprocessing", "namadataset_preprocessing")
+        os.path.join("preprocessing", "namadataset_preprocessing"),
+        os.path.join("MLProject", "namadataset_preprocessing") # Tambahan path untuk GitHub Actions
     ]
     
     data_path = None
@@ -28,7 +31,7 @@ def main():
             
     if data_path is None:
         print("[ERROR] File 'namadataset_preprocessing' tidak ditemukan!")
-        print("Pastikan kamu sudah copy file hasil preprocess ke dalam folder 'Membangun_model'.")
+        print("Pastikan kamu sudah copy file hasil preprocess ke dalam folder 'Membangun_model' atau 'MLProject'.")
         return
         
     print(f"-> Membaca dataset dari: {data_path}")
@@ -41,7 +44,8 @@ def main():
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    with mlflow.start_run():
+    # === PERBAIKAN UTAMA: Gunakan nested=True agar tidak konflik ID saat di-run lewat mlflow cli ===
+    with mlflow.start_run(nested=True):
         print("Sedang melatih model Random Forest Regressor...")
         model = RandomForestRegressor(random_state=42)
         model.fit(X_train, y_train)
@@ -53,7 +57,6 @@ def main():
         rmse = np.sqrt(mean_squared_error(y_test, predictions))
         mape = mean_absolute_percentage_error(y_test, predictions)
         r2 = r2_score(y_test, predictions)
-        
         
         print("\n=== Model Sukses Dilatih! ===")
         print(f"MAE       : {mae:.2f}")
