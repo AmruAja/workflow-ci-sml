@@ -1,0 +1,46 @@
+name: Car Price Prediction Workflow CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Mengambil kode dari repositori GitHub kamu
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2. Setup environment Python (Sudah diperbaiki dari python-python)
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    # 3. Install library yang dibutuhkan untuk testing script
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mlflow pandas numpy scikit-learn
+
+    # === TAMBAHAN REVISI: Menjalankan Eksperimen MLflow sesuai instruksi reviewer ===
+    - name: Run MLflow Experiment
+      run: |
+        mlflow run . --no-conda
+
+    # 4. Login otomatis ke akun Docker Hub milikmu
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # 5. Membuat (Build) Image Docker dan Mengunggah (Push) ke Docker Hub amruaja
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t amruaja/workflow-ci-sml:latest .
+        docker push amruaja/workflow-ci-sml:latest
